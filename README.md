@@ -1,10 +1,8 @@
 # Overview
-These are Ansible plays specific to a particual hardware layout.  It will install Docker and Docker Compose into a single box.
+These are Ansible plays specific to a particular hardware layout.  It will start particualr Docker containers that are expected to already be on the box.
 
 # Prerequisites
-* target box must be Ubuntu 14.04 server 
-* `/dev/sdb` on the target box should exist and be 8GB in size
-* `/dev/sdc` on the target box should exist and be 8GB in size
+TODO
 
 # Building
 All the components of the environment live in repositories on the internet so there is nothing to build.
