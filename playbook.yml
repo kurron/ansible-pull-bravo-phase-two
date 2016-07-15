@@ -1,12 +1,5 @@
 #!/usr/bin/env ansible-playbook
 
-- hosts: all
-  vars:
-       alpha_ip: "10.10.10.10"
-       bravo_ip: "10.10.10.20"
-       log_driver: "json-file"
-       network_mode: "bridge"
-
 - name: Gather prerequisites
   hosts: all
   gather_facts: True
@@ -25,6 +18,8 @@
   hosts: Ubuntu
   become: False
   vars:
+       alpha_ip: "10.10.10.10"
+       bravo_ip: "10.10.10.20"
        http_port: "2080"
        jmx_port: "2020"
        key_store_alias: "server"
@@ -53,11 +48,11 @@
                 mli-forever: "{{ bravo_ip }}"
             hostname: "report-generator"
             image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
-            log_driver: "{{ log_driver }}"
+            log_driver: "json-file"
             log_options:
                 max-size: "50m"
             name: "report-generator"
-            network_mode: "{{ network_mode }}"
+            network_mode: "bridge"
             published_ports:
             - "{{ http_port }}:8080"
             - "{{ jmx_port }}:2020"
@@ -72,6 +67,8 @@
   hosts: Ubuntu
   become: False
   vars:
+       alpha_ip: "10.10.10.10"
+       bravo_ip: "10.10.10.20"
        core_services_tag: "1.0.768.MILESTONE"
        http_port: "3080"
        jmx_port: "3020"
@@ -91,11 +88,11 @@
                 rabbitmq: "{{ alpha_ip }}"
             hostname: "event-processor"
             image: "registry.transparent.com/mold-e-reporting-event-processor:{{ core_services_tag }}"
-            log_driver: "{{ log_driver }}"
+            log_driver: "json-file"
             log_options:
                 max-size: "50m"
             name: "event-processor"
-            network_mode: "{{ network_mode }}"
+            network_mode: "bridge"
             published_ports:
             - "{{ http_port }}:8080"
             - "{{ jmx_port }}:2020"
