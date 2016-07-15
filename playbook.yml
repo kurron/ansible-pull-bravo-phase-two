@@ -46,9 +46,7 @@
                 mold-e_keyStoreAlias: "{{ key_store_alias }}"
                 mold-e_mliForeverPort: "{{ mli_forever_port }}"
             etc_hosts:
-                mongodb: "{{ alpha_ip }}"
-                mysql: "{{ alpha_ip }}"
-                rabbitmq: "{{ alpha_ip }}"
+                mongo: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
             hostname: "rest-services"
             image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
