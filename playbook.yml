@@ -1,11 +1,5 @@
 #!/usr/bin/env ansible-playbook
 
-vars:
-     log_driver: "json-file"
-     network_mode: "bridge"
-     alpha_ip: "10.10.10.10"
-     bravo_ip: "10.10.10.20"
-
 - name: Gather prerequisites
   hosts: all
   gather_facts: True
@@ -24,12 +18,16 @@ vars:
   hosts: Ubuntu
   become: False
   vars:
+       alpha_ip: "10.10.10.10"
+       bravo_ip: "10.10.10.20"
        http_port: "2080"
        jmx_port: "2020"
-       key_store_path: "/tls/keystore.jks"
-       key_store_password: "CHANGEME"
        key_store_alias: "server"
+       key_store_password: "CHANGEME"
+       key_store_path: "/tls/keystore.jks"
+       log_driver: "json-file"
        mli_forever_port: "0000"
+       network_mode: "bridge"
        rest_services_tag: "1.0.944.MILESTONE"
        tls_directory: "/tmp"
   tasks:
