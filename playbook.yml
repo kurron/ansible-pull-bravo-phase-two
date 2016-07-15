@@ -51,7 +51,6 @@
                 rabbitmq: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
             hostname: "rest-services"
-            ignore_image: True
             image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
             log_driver: "{{ log_driver }}"
             log_options:
