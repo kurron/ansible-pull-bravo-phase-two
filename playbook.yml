@@ -1,5 +1,12 @@
 #!/usr/bin/env ansible-playbook
 
+- hosts: all
+  vars:
+       alpha_ip: "10.10.10.10"
+       bravo_ip: "10.10.10.20"
+       log_driver: "json-file"
+       network_mode: "bridge"
+
 - name: Gather prerequisites
   hosts: all
   gather_facts: True
@@ -18,16 +25,12 @@
   hosts: Ubuntu
   become: False
   vars:
-       alpha_ip: "10.10.10.10"
-       bravo_ip: "10.10.10.20"
        http_port: "2080"
        jmx_port: "2020"
        key_store_alias: "server"
        key_store_password: "CHANGEME"
        key_store_path: "/tls/keystore.jks"
-       log_driver: "json-file"
        mli_forever_port: "0000"
-       network_mode: "bridge"
        rest_services_tag: "1.0.944.MILESTONE"
        tls_directory: "/tmp"
   tasks:
@@ -48,12 +51,12 @@
             etc_hosts:
                 mongo: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
-            hostname: "rest-services"
+            hostname: "report-generator"
             image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
             log_driver: "{{ log_driver }}"
             log_options:
                 max-size: "50m"
-            name: "rest-services"
+            name: "report-generator"
             network_mode: "{{ network_mode }}"
             published_ports:
             - "{{ http_port }}:8080"
@@ -64,4 +67,40 @@
             trust_image_content: True
             volumes:
             - "{{ tls_directory }}:/tls:ro"
+
+- name: Start Event Processor
+  hosts: Ubuntu
+  become: False
+  vars:
+       core_services_tag: "1.0.768.MILESTONE"
+       http_port: "3080"
+       jmx_port: "3020"
+  tasks:
+      - docker_container:
+            detach: True
+            env:
+                SPRING_PROFILES_ACTIVE: "default"
+                LFS_DOMAIN_NAME: "dumb"
+                JVM_HEAP_MIN: "256m"
+                JVM_HEAP_MAX: "256m"
+                JVM_JMX_HOST: "{{ bravo_ip }}"
+                JVM_JMX_PORT: "{{ jmx_port }}"
+                JVM_JMX_RMI_PORT: "{{ jmx_port }}"
+            etc_hosts:
+                mongodb: "{{ alpha_ip }}"
+                rabbitmq: "{{ alpha_ip }}"
+            hostname: "event-processor"
+            image: "registry.transparent.com/mold-e-reporting-event-processor:{{ core_services_tag }}"
+            log_driver: "{{ log_driver }}"
+            log_options:
+                max-size: "50m"
+            name: "event-processor"
+            network_mode: "{{ network_mode }}"
+            published_ports:
+            - "{{ http_port }}:8080"
+            - "{{ jmx_port }}:2020"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
 
