@@ -1,5 +1,11 @@
 #!/usr/bin/env ansible-playbook
 
+vars:
+     log_driver: "json-file"
+     network_mode: "bridge"
+     alpha_ip: "10.10.10.10"
+     bravo_ip: "10.10.10.20"
+
 - name: Gather prerequisites
   hosts: all
   gather_facts: True
@@ -11,44 +17,56 @@
   hosts: Ubuntu
   become: True
   tasks:
+      - hostname: name=bravo
       - pip: name=httpie
 
-- name: Pull Down Docker Containers
-# hosts: Ubuntu
-  hosts: nobody
+- name: Start Report Generator
+  hosts: Ubuntu
   become: False
-  tags:
-  - images
   vars:
-       rest_services_tag: 1.0.944.MILESTONE
-       core_services_tag: 1.0.768.MILESTONE
-       tlo_tag: 1.11.21
-       lds_tag: 1.0.898
-       mli_tag: 14-master
-       journaler_tag: 16-master
+       http_port: "2080"
+       jmx_port: "2020"
+       key_store_path: "/tls/keystore.jks"
+       key_store_password: "CHANGEME"
+       key_store_alias: "server"
+       mli_forever_port: "0000"
+       rest_services_tag: "1.0.944.MILESTONE"
+       tls_directory: "/tmp"
   tasks:
-      - docker_image:
-            name: "registry.transparent.com/mold-e-rest-services"
-            tag: "{{ rest_services_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/mold-e-reporting-event-processor"
-            tag: "{{ core_services_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/tlo"
-            tag: "{{ tlo_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/lds"
-            tag: "{{ lds_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/lds-varnish"
-            tag: "{{ lds_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/lds-nginx"
-            tag: "{{ lds_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/molde-mli-forever"
-            tag: "{{ mli_tag }}"
-      - docker_image:
-            name: "registry.transparent.com/molde-journal"
-            tag: "{{ journaler_tag }}"
+      - docker_container:
+            detach: True
+            env:
+                SPRING_PROFILES_ACTIVE: "default"
+                LFS_DOMAIN_NAME: "dumb"
+                JVM_HEAP_MIN: "256m"
+                JVM_HEAP_MAX: "256m"
+                JVM_JMX_HOST: "{{ bravo_ip }}"
+                JVM_JMX_PORT: "{{ jmx_port }}"
+                JVM_JMX_RMI_PORT: "{{ jmx_port }}"
+                mold-e_keyStorePath: "{{ key_store_path }}"
+                mold-e_keyStorePassword: "{{ key_store_password }}"
+                mold-e_keyStoreAlias: "{{ key_store_alias }}"
+                mold-e_mliForeverPort: "{{ mli_forever_port }}"
+            etc_hosts:
+                mongodb: "{{ alpha_ip }}"
+                mysql: "{{ alpha_ip }}"
+                rabbitmq: "{{ alpha_ip }}"
+                mli-forever: "{{ bravo_ip }}"
+            hostname: "rest-services"
+            ignore_image: True
+            image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
+            log_driver: "{{ log_driver }}"
+            log_options:
+                max-size: "50m"
+            name: "rest-services"
+            network_mode: "{{ network_mode }}"
+            published_ports:
+            - "{{ http_port }}:8080"
+            - "{{ jmx_port }}:2020"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+            volumes:
+            - "{{ tls_directory }}:/tls:ro"
 
