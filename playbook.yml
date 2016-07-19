@@ -25,8 +25,8 @@
        key_store_alias: "server"
        key_store_password: "CHANGEME"
        key_store_path: "/tls/keystore.jks"
-       mli_forever_port: "0000"
-       rest_services_tag: "1.0.944.MILESTONE"
+       mli_forever_port: "4080"
+       image_tag: "1.0.944.MILESTONE"
        tls_directory: "/tmp"
   tasks:
       - docker_container:
@@ -47,7 +47,7 @@
                 mongo: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
             hostname: "report-generator"
-            image: "registry.transparent.com/mold-e-rest-services:{{ rest_services_tag }}"
+            image: "registry.transparent.com/mold-e-rest-services:{{ image_tag }}"
             log_driver: "json-file"
             log_options:
                 max-size: "50m"
@@ -69,7 +69,7 @@
   vars:
        alpha_ip: "10.10.10.10"
        bravo_ip: "10.10.10.20"
-       core_services_tag: "1.0.768.MILESTONE"
+       image_tag: "1.0.768.MILESTONE"
        http_port: "3080"
        jmx_port: "3020"
   tasks:
@@ -87,7 +87,7 @@
                 mongodb: "{{ alpha_ip }}"
                 rabbitmq: "{{ alpha_ip }}"
             hostname: "event-processor"
-            image: "registry.transparent.com/mold-e-reporting-event-processor:{{ core_services_tag }}"
+            image: "registry.transparent.com/mold-e-reporting-event-processor:{{ image_tag }}"
             log_driver: "json-file"
             log_options:
                 max-size: "50m"
@@ -96,6 +96,50 @@
             published_ports:
             - "{{ http_port }}:8080"
             - "{{ jmx_port }}:2020"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+
+- name: Start MLI4Ever Event Processor
+  hosts: Ubuntu
+  become: False
+  vars:
+       alpha_ip: "10.10.10.10"
+       bravo_ip: "10.10.10.20"
+       image_tag: "15-master"
+       http_port: "4080"
+  tasks:
+      - docker_container:
+            command: [python, manage.py, consume]
+            detach: True
+            env:
+                MLI4EVR_AMQP_HOST: "{{ alpha_ip }}"
+                MLI4EVR_AMQP_USER: "guest"
+                MLI4EVR_AMQP_PASSWORD: "guest"
+                MLI4EVR_AMQP_VHOST: "/"
+                MLI4EVR_AMQP_EXCHANGE: "exchange-events"
+                MLI4EVR_AMQP_QUEUE: "mli-forever"
+                MLI4EVR_AMQP_CONSUMERS: 10
+                MLI4EVR_DB_HOST: "{{ alpha_ip }}"
+                MLI4EVR_DB_USER: "root"
+                MLI4EVR_DB_PASSWORD: ""
+                MLI4EVR_DB_NAME: "mli4ever"
+                MLI4EVR_DEBUGGING_ENABLED: "False"
+                MLI4EVR_LOGGING_LOGFACES_HOST: "192.168.254.123"
+                MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
+            etc_hosts:
+                mongodb: "{{ alpha_ip }}"
+                rabbitmq: "{{ alpha_ip }}"
+            hostname: "mli-event-processor"
+            image: "registry.transparent.com/molde-mli-forever:{{ image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "mli-event-processor"
+            network_mode: "bridge"
+            published_ports:
+            - "{{ http_port }}:8080"
             pull: False
             restart_policy: "always"
             state: "started"
