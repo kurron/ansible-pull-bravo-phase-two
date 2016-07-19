@@ -125,7 +125,7 @@
                 MLI4EVR_DB_USER: "root"
                 MLI4EVR_DB_PASSWORD: ""
                 MLI4EVR_DB_NAME: "mli4ever"
-                MLI4EVR_DEBUGGING_ENABLED: "False"
+                MLI4EVR_DEBUGGING_ENABLED: "True"
                 MLI4EVR_LOGGING_LOGFACES_HOST: "192.168.254.123"
                 MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
             etc_hosts:
