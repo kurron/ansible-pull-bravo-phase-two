@@ -22,8 +22,8 @@
        bravo_ip: "10.10.10.20"
        logfaces_ip: "192.168.254.123"
 
-       mysql_user: "root"
-       mysql_password: ""
+       mysql_user: "mli"
+       mysql_password: "mli"
 
        rabbitmq_user: "guest"
        rabbitmq_password: "guest"
