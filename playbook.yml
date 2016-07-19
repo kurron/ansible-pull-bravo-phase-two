@@ -123,7 +123,7 @@
                 MLI4EVR_DB_PASSWORD: "{{ mysql_password }}"
                 MLI4EVR_DB_NAME: "mli4ever"
                 MLI4EVR_DEBUGGING_ENABLED: "True"
-                MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces
+                MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
                 MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
             etc_hosts:
                 logfaces: "{{ logfaces_ip }}"
