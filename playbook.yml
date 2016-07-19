@@ -20,6 +20,15 @@
   vars:
        alpha_ip: "10.10.10.10"
        bravo_ip: "10.10.10.20"
+       logfaces_ip: "192.168.254.123"
+
+       mysql_user: "root"
+       mysql_password: ""
+
+       rabbitmq_user: "guest"
+       rabbitmq_password: "guest"
+       rabbitmq_vhost: "/"
+
        report_generator_http_port: "2080"
        report_generator_jmx_port: "2020"
        report_generator_image_tag: "1.0.944.MILESTONE"
@@ -28,10 +37,9 @@
        report_event_processor_http_port: "3080"
        report_event_processor_jmx_port: "3020"
 
-       mli_forever_port: "4080"
-
-       mli_event_processor_image_tag: "14-master"
+       mli_image_tag: "14-master"
        mli_event_processor_http_port: "4080"
+       mli_rest_api_http_port: "5080"
 
   tasks:
       - name: Mold-E REST Services
@@ -48,7 +56,7 @@
                 mold-e_keyStorePath: "/tls/keystore.jks"
                 mold-e_keyStorePassword: "CHANGEME"
                 mold-e_keyStoreAlias: "server"
-                mold-e_mliForeverPort: "{{ mli_forever_port }}"
+                mold-e_mliForeverPort: "{{ mli_rest_api_http_port }}"
             etc_hosts:
                 mongo: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
@@ -103,25 +111,26 @@
             command: [python, manage.py, consume]
             detach: True
             env:
-                MLI4EVR_AMQP_HOST: "{{ alpha_ip }}"
-                MLI4EVR_AMQP_USER: "guest"
-                MLI4EVR_AMQP_PASSWORD: "guest"
-                MLI4EVR_AMQP_VHOST: "/"
+                MLI4EVR_AMQP_HOST: "rabbitmq"
+                MLI4EVR_AMQP_USER: "{{ rabbitmq_user }}"
+                MLI4EVR_AMQP_PASSWORD: "{{ rabbitmq_password }}"
+                MLI4EVR_AMQP_VHOST: "{{ rabbitmq_vhost }}"
                 MLI4EVR_AMQP_EXCHANGE: "exchange-events"
                 MLI4EVR_AMQP_QUEUE: "mli-forever"
                 MLI4EVR_AMQP_CONSUMERS: 10
-                MLI4EVR_DB_HOST: "{{ alpha_ip }}"
-                MLI4EVR_DB_USER: "root"
-                MLI4EVR_DB_PASSWORD: ""
+                MLI4EVR_DB_HOST: "mysql"
+                MLI4EVR_DB_USER: "{{ mysql_user }}"
+                MLI4EVR_DB_PASSWORD: "{{ mysql_password }}"
                 MLI4EVR_DB_NAME: "mli4ever"
                 MLI4EVR_DEBUGGING_ENABLED: "True"
-                MLI4EVR_LOGGING_LOGFACES_HOST: "192.168.254.123"
+                MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces
                 MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
             etc_hosts:
-                mongodb: "{{ alpha_ip }}"
+                logfaces: "{{ logfaces_ip }}"
+                mysql: "{{ alpha_ip }}"
                 rabbitmq: "{{ alpha_ip }}"
             hostname: "mli-event-processor"
-            image: "registry.transparent.com/molde-mli-forever:{{ mli_event_processor_image_tag }}"
+            image: "registry.transparent.com/molde-mli-forever:{{ mli_image_tag }}"
             log_driver: "json-file"
             log_options:
                 max-size: "50m"
@@ -129,6 +138,34 @@
             network_mode: "bridge"
             published_ports:
             - "{{ mli_event_processor_http_port }}:8080"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+
+      - name: MLI REST API
+        docker_container:
+            detach: True
+            env:
+                MLI4EVR_DB_HOST: "mysql"
+                MLI4EVR_DB_USER: "{{ mysql_user }}"
+                MLI4EVR_DB_PASSWORD: "{{ mysql_password }}"
+                MLI4EVR_DB_NAME: "mli4ever"
+                MLI4EVR_DEBUGGING_ENABLED: "True"
+                MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
+                MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
+            etc_hosts:
+                logfaces: "{{ logfaces_ip }}"
+                mysql: "{{ alpha_ip }}"
+            hostname: "mli-rest-api"
+            image: "registry.transparent.com/molde-mli-forever:{{ mli_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "mli-rest-api"
+            network_mode: "bridge"
+            published_ports:
+            - "{{ mli_rest_api_http_port }}:8080"
             pull: False
             restart_policy: "always"
             state: "started"
