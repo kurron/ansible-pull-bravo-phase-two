@@ -123,7 +123,7 @@
                 MLI4EVR_AMQP_CONSUMERS: 10
                 MLI4EVR_DB_HOST: "{{ alpha_ip }}"
                 MLI4EVR_DB_USER: "root"
-                MLI4EVR_DB_PASSWORD: "mysql"
+                MLI4EVR_DB_PASSWORD: ""
                 MLI4EVR_DB_NAME: "mli4ever"
                 MLI4EVR_DEBUGGING_ENABLED: "False"
                 MLI4EVR_LOGGING_LOGFACES_HOST: "192.168.254.123"
