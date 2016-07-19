@@ -107,7 +107,7 @@
   vars:
        alpha_ip: "10.10.10.10"
        bravo_ip: "10.10.10.20"
-       image_tag: "15-master"
+       image_tag: "14-master"
        http_port: "4080"
   tasks:
       - docker_container:
