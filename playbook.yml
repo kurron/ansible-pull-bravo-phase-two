@@ -59,6 +59,7 @@
                 JVM_JMX_HOST: "{{ bravo_ip }}"
                 JVM_JMX_PORT: "{{ report_generator_jmx_port }}"
                 JVM_JMX_RMI_PORT: "{{ report_generator_jmx_port }}"
+                server_contextPath: "/"
                 mold-e_keyStorePath: "/tls/keystore.jks"
                 mold-e_keyStorePassword: "CHANGEME"
                 mold-e_keyStoreAlias: "server"
