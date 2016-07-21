@@ -13,6 +13,7 @@
   tasks:
       - hostname: name=bravo
       - pip: name=httpie
+      - apt: name=mysql-client-5.6 state=present update_cache=true cache_valid_time=3600 install_recommends=true
 
 - name: Start Docker Containers
   hosts: Ubuntu
@@ -29,6 +30,9 @@
        rabbitmq_password: "guest"
        rabbitmq_vhost: "/"
 
+       reporting_exchange: "exchange-events"
+       reporting_database: "reporting"
+
        report_generator_http_port: "2080"
        report_generator_jmx_port: "2020"
        report_generator_image_tag: "1.0.944.MILESTONE"
@@ -40,6 +44,8 @@
        mli_image_tag: "14-master"
        mli_event_processor_http_port: "4080"
        mli_rest_api_http_port: "5080"
+
+       journaler_image_tag: "16-master"
 
   tasks:
       - name: Mold-E REST Services
@@ -57,8 +63,11 @@
                 mold-e_keyStorePassword: "CHANGEME"
                 mold-e_keyStoreAlias: "server"
                 mold-e_mliForeverPort: "{{ mli_rest_api_http_port }}"
+                mold-mongoHost: "mongodb"
+                mold-mongoDatabaseName: "{{ reporting_database }}"
+# TODO: Visualiz-E settings
             etc_hosts:
-                mongo: "{{ alpha_ip }}"
+                mongodb: "{{ alpha_ip }}"
                 mli-forever: "{{ bravo_ip }}"
             hostname: "report-generator"
             image: "registry.transparent.com/mold-e-rest-services:{{ report_generator_image_tag }}"
@@ -88,6 +97,13 @@
                 JVM_JMX_HOST: "{{ bravo_ip }}"
                 JVM_JMX_PORT: "{{ report_event_processor_jmx_port }}"
                 JVM_JMX_RMI_PORT: "{{ report_event_processor_jmx_port }}"
+                mold-e_rabbitExchangeName: "{{ reporting_exchange }}"
+                spring_rabbitmq_host: "rabbitmq"
+                spring_rabbitmq_virtual-host: "{{ rabbitmq_vhost }}"
+                spring_rabbitmq_username: "{{ rabbitmq_user }}"
+                spring_rabbitmq_password: "{{ rabbitmq_password }}"
+                spring_data_mongodb_host: "mongodb"
+                spring_data_mongodb_database: "{{ reporting_database }}"
             etc_hosts:
                 mongodb: "{{ alpha_ip }}"
                 rabbitmq: "{{ alpha_ip }}"
@@ -115,7 +131,7 @@
                 MLI4EVR_AMQP_USER: "{{ rabbitmq_user }}"
                 MLI4EVR_AMQP_PASSWORD: "{{ rabbitmq_password }}"
                 MLI4EVR_AMQP_VHOST: "{{ rabbitmq_vhost }}"
-                MLI4EVR_AMQP_EXCHANGE: "exchange-events"
+                MLI4EVR_AMQP_EXCHANGE: "{{ reporting_exchange }}"
                 MLI4EVR_AMQP_QUEUE: "mli-forever"
                 MLI4EVR_AMQP_CONSUMERS: 10
                 MLI4EVR_DB_HOST: "mysql"
@@ -166,6 +182,35 @@
             network_mode: "bridge"
             published_ports:
             - "{{ mli_rest_api_http_port }}:8080"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+
+      - name: Event Journaler
+        docker_container:
+            detach: True
+            env:
+                JOURNAL_AMQP_HOST: "rabbitmq"
+                JOURNAL_AMQP_USER: "{{ rabbitmq_user }}"
+                JOURNAL_AMQP_PASSWORD: "{{ rabbitmq_password }}"
+                JOURNAL_AMQP_VHOST: "{{ rabbitmq_vhost }}"
+                JOURNAL_AMQP_EXCHANGE: "{{ reporting_exchange }}"
+                JOURNAL_AMQP_QUEUE: "event-journal"
+                JOURNAL_AMQP_CONSUMERS: 2
+                JOURNAL_MONGO_HOST: "mongodb"
+                JOURNAL_MONGO_DB: "reporting-event-journal"
+                JOURNAL_MONGO_COLLECTION: "journaledEvent"
+            etc_hosts:
+                mongodb: "{{ alpha_ip }}"
+                rabbitmq: "{{ alpha_ip }}"
+            hostname: "event-journaler"
+            image: "registry.transparent.com/molde-journal:{{ journaler_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "event-journaler"
+            network_mode: "bridge"
             pull: False
             restart_policy: "always"
             state: "started"
