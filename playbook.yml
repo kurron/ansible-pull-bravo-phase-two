@@ -63,8 +63,8 @@
                 mold-e_keyStorePassword: "CHANGEME"
                 mold-e_keyStoreAlias: "server"
                 mold-e_mliForeverPort: "{{ mli_rest_api_http_port }}"
-                mold-mongoHost: "mongodb"
-                mold-mongoDatabaseName: "{{ reporting_database }}"
+                mold-e_mongoHost: "mongodb"
+                mold-e_mongoDatabaseName: "{{ reporting_database }}"
 # TODO: Visualiz-E settings
             etc_hosts:
                 mongodb: "{{ alpha_ip }}"
