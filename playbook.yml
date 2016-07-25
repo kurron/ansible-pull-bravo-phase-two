@@ -56,6 +56,8 @@
        lds_base: "/opt/lds"
        lds_web_fonts: "{{ lds_base }}/webfonts"
        lds_static_content: "{{ lds_base}}/static"
+       lds_varnish_http_port: 7700
+       lds_varnishd_params: "-p default_ttl=82800"
 
   tasks:
       - name: Mold-E REST Services
@@ -227,7 +229,7 @@
             state: "started"
             trust_image_content: True
 
-      # create the local directoris for LDS
+      # create the local directoris for LDS, which is probably a bad practice
       - file: path="{{ lds_base }}" state=directory mode=0755
       - file: path="{{ lds_static_content }}" state=directory mode=0755
       - unarchive: src="http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz" dest="{{ lds_base }}" copy=no mode=0555
@@ -255,5 +257,30 @@
             - "{{ lds_web_fonts }}:/opt/media/webfonts:ro"
             - "{{ lds_static_content }}:/opt/lds_static:rw"
             command: ["{{ lds_profile }}", "{{ lds_liquibase_sync }}", "{{ lds_extra_config }}"]
+
+      - name: Varnish
+        docker_container:
+            detach: True
+            env:
+                VARNISH_BACKEND_PORT: "{{ lds_http_port }}"
+                VARNISH_BACKEND_IP: "bravo"
+                VARNISH_PORT: "{{ lds_varnish_http_port }}"
+                VARNISHD_PARAMS: "{{ lds_varnishd_params }}"
+                CACHE_SIZE: "64m"
+            etc_hosts:
+                lds: "{{ bravo_ip }}"
+            hostname: "varnish"
+            image: "registry.transparent.com/lds-varnish:{{ lds_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "varnish"
+            network_mode: "bridge"
+            published_ports:
+            - "{{ lds_varnish_http_port }}:6081"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
 
 
