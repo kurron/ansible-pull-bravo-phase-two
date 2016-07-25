@@ -46,11 +46,13 @@
 
        journaler_image_tag: "16-master"
 
-       lds_image_tag: "1.0.898"
+       lds_image_tag: "1.0.900"
        lds_http_port: 7400
+       lds_mysql_user: "lds"
+       lds_mysql_password: "lds"
        lds_profile: "dev"
-       lds_liquibase_sync: ""
-       lds_extra_config: ""
+       lds_liquibase_sync: "yes"
+       lds_extra_config: "DATABASE_HOST=mysql~USE_GRAYLOG=False~LOCAL_IP_OVERRIDE={{ bravo_ip }}~DATABASE_USER={{ lds_mysql_user }}~DATABASE_PASSWORD={{ lds_mysql_password }}"
        lds_web_fonts: "/tmp"
        lds_static_content: "/tmp"
 
@@ -245,7 +247,7 @@
 #TODO: the use of file system is frowned upon due to migration complications. Can we do better?
             volumes:
             - "{{ lds_web_fonts }}:/opt/media/webfonts:ro"
-            - "{{ lds_static_content }}:/opt/lds_static:ro"
+            - "{{ lds_static_content }}:/opt/lds_static:rw"
             command: ["{{ lds_profile }}", "{{ lds_liquibase_sync }}", "{{ lds_extra_config }}"]
 
 
