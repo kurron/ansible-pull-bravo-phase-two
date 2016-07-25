@@ -226,10 +226,12 @@
             state: "started"
             trust_image_content: True
 
+      # create the local directoris for LDS
+      - file: path="{{ lds_web_fonts }}" state=directory mode=0755
+      - file: path="{{ lds_static_content }}" state=directory mode=0755
+      - unarchive: src= http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz dest="{{ lds_web_fonts }}" copy=no mode=0444
+
       - name: Language Data Service
-        file: path="{{ lds_web_fonts }}" state=directory mode=0755
-        file: path="{{ lds_static_content }}" state=directory mode=0755
-        unarchive: src= http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz dest="{{ lds_web_fonts }}" copy=no mode=0444
         docker_container:
             detach: True
             etc_hosts:
