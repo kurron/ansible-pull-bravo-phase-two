@@ -47,6 +47,14 @@
 
        journaler_image_tag: "16-master"
 
+       lds_image_tag: "1.0.898"
+       lds_http_port: 7400
+       lds_profile: "dev"
+       lds_liquibase_sync: ""
+       lds_extra_config: ""
+       lds_web_fonts: "/tmp"
+       lds_static_content: "/tmp"
+
   tasks:
       - name: Mold-E REST Services
         docker_container:
@@ -216,4 +224,29 @@
             restart_policy: "always"
             state: "started"
             trust_image_content: True
+
+      - name: Language Data Service
+        docker_container:
+            detach: True
+            etc_hosts:
+                mysql: "{{ alpha_ip }}"
+            hostname: "lds"
+            image: "registry.transparent.com/lds:{{ lds_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "lds"
+            network_mode: "bridge"
+            published_ports:
+            - "{{ lds_http_port }}:8000"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+#TODO: the use of file system is frowned upon due to migration complications. Can we do better?
+            volumes:
+            - "{{ lds_web_fonts }}:/opt/media/webfonts:ro"
+            - "{{ lds_static_content }}:/opt/lds_static:ro"
+            command: ["{{ lds_profile }}", "{{ lds_liquibase_sync }}", "{{ lds_extra_config }}"]
+
 
