@@ -23,9 +23,6 @@
        bravo_ip: "10.10.10.20"
        logfaces_ip: "192.168.254.123"
 
-       mysql_user: "mli"
-       mysql_password: "mli"
-
        rabbitmq_user: "guest"
        rabbitmq_password: "guest"
        rabbitmq_vhost: "/"
@@ -44,6 +41,8 @@
        mli_image_tag: "14-master"
        mli_event_processor_http_port: "4080"
        mli_rest_api_http_port: "5080"
+       mli_mysql_user: "mli"
+       mli_mysql_password: "mli"
 
        journaler_image_tag: "16-master"
 
@@ -144,8 +143,8 @@
                 MLI4EVR_AMQP_QUEUE: "mli-forever"
                 MLI4EVR_AMQP_CONSUMERS: 10
                 MLI4EVR_DB_HOST: "mysql"
-                MLI4EVR_DB_USER: "{{ mysql_user }}"
-                MLI4EVR_DB_PASSWORD: "{{ mysql_password }}"
+                MLI4EVR_DB_USER: "{{ mli_mysql_user }}"
+                MLI4EVR_DB_PASSWORD: "{{ mli_mysql_password }}"
                 MLI4EVR_DB_NAME: "mli4ever"
                 MLI4EVR_DEBUGGING_ENABLED: "True"
                 MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
@@ -173,8 +172,8 @@
             detach: True
             env:
                 MLI4EVR_DB_HOST: "mysql"
-                MLI4EVR_DB_USER: "{{ mysql_user }}"
-                MLI4EVR_DB_PASSWORD: "{{ mysql_password }}"
+                MLI4EVR_DB_USER: "{{ mli_mysql_user }}"
+                MLI4EVR_DB_PASSWORD: "{{ mli_mysql_password }}"
                 MLI4EVR_DB_NAME: "mli4ever"
                 MLI4EVR_DEBUGGING_ENABLED: "True"
                 MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
