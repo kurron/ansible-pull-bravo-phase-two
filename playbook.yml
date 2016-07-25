@@ -53,8 +53,8 @@
        lds_profile: "dev"
        lds_liquibase_sync: "yes"
        lds_extra_config: "DATABASE_HOST=mysql~USE_GRAYLOG=False~LOCAL_IP_OVERRIDE={{ bravo_ip }}~DATABASE_USER={{ lds_mysql_user }}~DATABASE_PASSWORD={{ lds_mysql_password }}"
-       lds_web_fonts: "/tmp"
-       lds_static_content: "/tmp"
+       lds_web_fonts: "/opt/lds/fonts"
+       lds_static_content: "/opt/lds/static"
 
   tasks:
       - name: Mold-E REST Services
@@ -227,6 +227,9 @@
             trust_image_content: True
 
       - name: Language Data Service
+        file: path="{{ lds_web_fonts }}" state=directory mode=0755
+        file: path="{{ lds_static_content }}" state=directory mode=0755
+        unarchive: src= http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz dest="{{ lds_web_fonts }}" copy=no mode=0444
         docker_container:
             detach: True
             etc_hosts:
