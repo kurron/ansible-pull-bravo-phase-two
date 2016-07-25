@@ -230,7 +230,7 @@
       # create the local directoris for LDS
       - file: path="{{ lds_base }}" state=directory mode=0755
       - file: path="{{ lds_static_content }}" state=directory mode=0755
-      - unarchive: src="http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz" dest="{{ lds_web_fonts }}" copy=no mode=0555
+      - unarchive: src="http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz" dest="{{ lds_base }}" copy=no mode=0555
 
       - name: Language Data Service
         docker_container:
