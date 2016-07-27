@@ -263,7 +263,7 @@
             detach: True
             env:
                 VARNISH_BACKEND_PORT: "{{ lds_http_port }}"
-                VARNISH_BACKEND_IP: "bravo"
+                VARNISH_BACKEND_IP: "lds"
                 VARNISH_PORT: "{{ lds_varnish_http_port }}"
                 VARNISHD_PARAMS: "{{ lds_varnishd_params }}"
                 CACHE_SIZE: "64m"
