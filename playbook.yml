@@ -46,7 +46,7 @@
 
        journaler_image_tag: "16-master"
 
-       lds_image_tag: "1.0.898"
+       lds_image_tag: "1.0.900"
        lds_http_port: 7400
        lds_mysql_user: "lds"
        lds_mysql_password: "lds"
