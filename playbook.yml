@@ -236,9 +236,11 @@
       - file: path="{{ lds_base }}" state=directory mode=0755
       - file: path="{{ lds_static_content }}" state=directory mode=0755
       - file: path="{{ lds_nginx_tls }}" state=directory mode=0755
+      - file: path="{{ lds_nginx_tls }}/private" state=directory mode=0755
+      - file: path="{{ lds_nginx_tls }}/certs" state=directory mode=0755
       - unarchive: src="http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz" dest="{{ lds_base }}" copy=no mode=0555
-      - get_url: url="http://192.168.254.81:81/artifactory/static/ssl/2015-10-02/test/private/server.key" dest="{{ lds_nginx_tls }}/server.key" mode=0440
-      - get_url: url="http://192.168.254.81:81/artifactory/static/ssl/2015-10-02/test/certs/server.pem" dest="{{ lds_nginx_tls }}/server.pem" mode=0440
+      - get_url: url="http://192.168.254.81:81/artifactory/static/ssl/2015-10-02/test/private/server.key" dest="{{ lds_nginx_tls }}/private/server.key" mode=0440
+      - get_url: url="http://192.168.254.81:81/artifactory/static/ssl/2015-10-02/test/certs/server.pem" dest="{{ lds_nginx_tls }}/certs/server.pem" mode=0440
 
       - name: Language Data Service
         docker_container:
