@@ -58,6 +58,9 @@
        lds_static_content: "{{ lds_base}}/static"
        lds_varnish_http_port: 7700
        lds_varnishd_params: "-p default_ttl=82800"
+       lds_nginx_app_server_dns_internal: "lds"
+       lds_nginx_app_server_dns_external: "lds.transparent.com"
+       lds_nginx_tls: "{{ lds_base}}/tls"
 
   tasks:
       - name: Mold-E REST Services
@@ -229,9 +232,10 @@
             state: "started"
             trust_image_content: True
 
-      # create the local directoris for LDS, which is probably a bad practice
+      # create the local directories for LDS, which is probably a bad practice
       - file: path="{{ lds_base }}" state=directory mode=0755
       - file: path="{{ lds_static_content }}" state=directory mode=0755
+      - file: path="{{ lds_nginx_tls }}" state=directory mode=0755
       - unarchive: src="http://192.168.254.81:81/artifactory/static/lds/lds-webfonts-898.tar.gz" dest="{{ lds_base }}" copy=no mode=0555
 
       - name: Language Data Service
@@ -282,5 +286,43 @@
             restart_policy: "always"
             state: "started"
             trust_image_content: True
+
+
+      - name: Nginx
+        docker_container:
+            detach: True
+            env:
+                APP_PORT: {{ lds_http_port }}
+                VARNISH_PORT: {{ lds_varnish_http_port }}
+                APP_SERVER_IP: "{{ lds }}"
+                APP_SERVER_DNS_INTERNAL: "{{ lds_nginx_app_server_dns_internal }}"
+                APP_SERVER_DNS_EXTERNAL: "{{ nginx_app_server_dns_external }}"
+                APP_ROOT: "/opt/app"
+                PORT_HTTP: 80
+                PORT_HTTPS: 443
+                PORT_HTTP_SECONDARY: 81
+                PORT_HTTPS_SECONDARY: 444
+            etc_hosts:
+                lds: "{{ bravo_ip }}"
+            hostname: "ngnix"
+            image: "registry.transparent.com/lds-nginx:{{ lds_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "nginx"
+            network_mode: "bridge"
+            published_ports:
+            - "80:80"
+            - "443:443"
+            - "81:81"
+            - "444:444"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+#TODO: the use of file system is frowned upon due to migration complications. Can we do better?
+            volumes:
+            - "{{ lds_nginx_tls }}:/etc/ssl:ro"
+            - "{{ lds_static_content }}":/opt/lds_static:ro"
 
 
