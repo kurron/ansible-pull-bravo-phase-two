@@ -292,8 +292,8 @@
         docker_container:
             detach: True
             env:
-                APP_PORT: {{ lds_http_port }}
-                VARNISH_PORT: {{ lds_varnish_http_port }}
+                APP_PORT: "{{ lds_http_port }}"
+                VARNISH_PORT: "{{ lds_varnish_http_port }}"
                 APP_SERVER_IP: "{{ lds }}"
                 APP_SERVER_DNS_INTERNAL: "{{ lds_nginx_app_server_dns_internal }}"
                 APP_SERVER_DNS_EXTERNAL: "{{ nginx_app_server_dns_external }}"
@@ -324,5 +324,4 @@
             volumes:
             - "{{ lds_nginx_tls }}:/etc/ssl:ro"
             - "{{ lds_static_content }}:/opt/lds_static:ro"
-
 
