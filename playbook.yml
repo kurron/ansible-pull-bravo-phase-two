@@ -323,6 +323,6 @@
 #TODO: the use of file system is frowned upon due to migration complications. Can we do better?
             volumes:
             - "{{ lds_nginx_tls }}:/etc/ssl:ro"
-            - "{{ lds_static_content }}":/opt/lds_static:ro"
+            - "{{ lds_static_content }}:/opt/lds_static:ro"
 
 
