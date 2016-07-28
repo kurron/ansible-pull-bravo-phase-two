@@ -294,7 +294,7 @@
             env:
                 APP_PORT: "{{ lds_http_port }}"
                 VARNISH_PORT: "{{ lds_varnish_http_port }}"
-                APP_SERVER_IP: "{{ lds }}"
+                APP_SERVER_IP: "lds"
                 APP_SERVER_DNS_INTERNAL: "{{ lds_nginx_app_server_dns_internal }}"
                 APP_SERVER_DNS_EXTERNAL: "{{ nginx_app_server_dns_external }}"
                 APP_ROOT: "/opt/app"
