@@ -62,6 +62,11 @@
        lds_nginx_app_server_dns_external: "lds.transparent.com"
        lds_nginx_tls: "{{ lds_base}}/tls"
 
+       tlo_image_tag: "1.11.21"
+       tlo_base: "/opt/tlo"
+       tlo_storage: "{{ tlo_base }}/storage"
+       tlo_work: "{{ tlo_base }}/work"
+
   tasks:
       - name: Mold-E REST Services
         docker_container:
@@ -328,4 +333,65 @@
             volumes:
             - "{{ lds_nginx_tls }}:/etc/ssl:ro"
             - "{{ lds_static_content }}:/opt/lds_static:ro"
+
+      # create the local directories for TLO, which is probably a bad practice
+      - file: path="{{ tlo_base }}" state=directory mode=0755
+      - file: path="{{ tlo_storage }}" state=directory mode=0755
+      - file: path="{{ tlo_work }}" state=directory mode=0755
+
+      - name: TLO
+        docker_container:
+            detach: True
+            env:
+                BANNER: "TLO"
+                SERVICE_TLO: true
+                SERVICE_MYSQL: false
+                SERVICE_TLO_CREATE_DATABASES: false
+                TLO_PROFILE: "rr5"
+                TLO_CFG_BOX_DATASOURCE_JDBC_URL: "jdbc:mysql://mysql:3306/box?autoReconnect=true"
+                TLO_CFG_BOX_DATASOURCE_JDBC_USERNAME: "bykiweb"
+                TLO_CFG_BOX_DATASOURCE_JDBC_PASSWORD: "bykiweb"
+                TLO_CFG_CONSOLE_DATASOURCE_JDBC_URL: "jdbc:mysql://mysql:3306/console?autoReconnect=true"
+                TLO_CFG_CONSOLE_DATASOURCE_JDBC_USERNAME: "bykiweb"
+                TLO_CFG_CONSOLE_DATASOURCE_JDBC_PASSWORD: "bykiweb"
+                TLO_CAP_ENABLE_REPORTING_GROUPS: true
+                TLO_CFG_BOX_VERSION_USE_BUILDINFO: true
+                TLO_CFG_BOX_CONNECTOR_SSL: true
+                TLO_CFG_BOX_CONNECTOR_SSL_PORT: 8443
+                TLO_CFG_LMSS_AWS_ENABLE: false
+                TLO_SERVICE_JMX_HOSTNAME: "https://10.10.10.20"
+                TLO_SERVICE_JMX_PORT: 4000
+                TLO_SERVICE_MEM_INIT: "192m"
+                TLO_SERVICE_MEM_MAX: "1024m"
+                TLO_VERSION_CODENAME: "TLOILD"
+                TLO_SET_AMQP_BROKER_AUTHENTICATION: false
+                TLO_SET_INTEGRATION_CANONICAL_HOSTNAME: "https://ild.transparent.com"
+                TLO_SET_INTEGRATION_EVENTLOG_TRANSMITTER_PERIOD: 86400
+                TLO_SET_INTEGRATION_AMQP_BROKER_URI: "amqp://rabbitmq/rr5"
+            etc_hosts:
+                mysql: "{{ bravo_ip }}"
+                rabbitmq: "{{ bravo_ip }}"
+            hostname: "tlo"
+            image: "registry.transparent.com/tlo:{{ tlo_image_tag }}"
+            log_driver: "json-file"
+            log_options:
+                max-size: "50m"
+            name: "tlo"
+            network_mode: "bridge"
+            published_ports:
+            - "80:8080"
+            - "443:8443"
+            - "4000:4000"
+            pull: False
+            restart_policy: "always"
+            state: "started"
+            trust_image_content: True
+#TODO: the use of file system is frowned upon due to migration complications. Can we do better?
+            volumes:
+            - "{{ tlo_storage }}:/mnt/storage:rw"
+            - "{{ tlo_work }}/opt/tlo/work:rw"
+            - "/etc/localtime:/etc/localtime:ro"
+            - "/etc/timezone:/etc/timezone:ro"
+#           - "{{ tlo_base }}/tlo-client.jks:/opt/tlo/conf/jmx/tlo-client.jks:ro"
+#           - "{{ tlo_base }}/tlo-server.jks:/opt/tlo/conf/jmx/tlo-server.jks:ro"
 
