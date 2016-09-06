@@ -181,7 +181,8 @@
             network_mode: "bridge"
             published_ports:
             - "{{ mli_event_processor_http_port }}:8080"
-            pull: False
+#           pull: False
+            pull: True
             restart_policy: "always"
             state: "started"
             trust_image_content: True
