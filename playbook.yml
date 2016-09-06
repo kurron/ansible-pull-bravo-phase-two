@@ -143,42 +143,42 @@
             state: "started"
             trust_image_content: True
 
-      - name: MLI Event Processor
-        docker_container:
-            command: [python, manage.py, consume]
-            detach: True
-            env:
-                MLI4EVR_AMQP_HOST: "rabbitmq"
-                MLI4EVR_AMQP_USER: "{{ rabbitmq_user }}"
-                MLI4EVR_AMQP_PASSWORD: "{{ rabbitmq_password }}"
-                MLI4EVR_AMQP_VHOST: "{{ rabbitmq_vhost }}"
-                MLI4EVR_AMQP_EXCHANGE: "{{ reporting_exchange }}"
-                MLI4EVR_AMQP_QUEUE: "mli-forever"
-                MLI4EVR_AMQP_CONSUMERS: 10
-                MLI4EVR_DB_HOST: "mysql"
-                MLI4EVR_DB_USER: "{{ mli_mysql_user }}"
-                MLI4EVR_DB_PASSWORD: "{{ mli_mysql_password }}"
-                MLI4EVR_DB_NAME: "mli"
-                MLI4EVR_DEBUGGING_ENABLED: "True"
-                MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
-                MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
-            etc_hosts:
-                logfaces: "{{ logfaces_ip }}"
-                mysql: "{{ alpha_ip }}"
-                rabbitmq: "{{ alpha_ip }}"
-            hostname: "mli-event-processor"
-            image: "registry.transparent.com/molde-mli-forever:{{ mli_image_tag }}"
-            log_driver: "json-file"
-            log_options:
-                max-size: "50m"
-            name: "mli-event-processor"
-            network_mode: "bridge"
-            published_ports:
-            - "{{ mli_event_processor_http_port }}:8080"
-            pull: False
-            restart_policy: "always"
-            state: "started"
-            trust_image_content: True
+#     - name: MLI Event Processor
+#       docker_container:
+#           command: [python, manage.py, consume]
+#           detach: True
+#           env:
+#               MLI4EVR_AMQP_HOST: "rabbitmq"
+#               MLI4EVR_AMQP_USER: "{{ rabbitmq_user }}"
+#               MLI4EVR_AMQP_PASSWORD: "{{ rabbitmq_password }}"
+#               MLI4EVR_AMQP_VHOST: "{{ rabbitmq_vhost }}"
+#               MLI4EVR_AMQP_EXCHANGE: "{{ reporting_exchange }}"
+#               MLI4EVR_AMQP_QUEUE: "mli-forever"
+#               MLI4EVR_AMQP_CONSUMERS: 10
+#               MLI4EVR_DB_HOST: "mysql"
+#               MLI4EVR_DB_USER: "{{ mli_mysql_user }}"
+#               MLI4EVR_DB_PASSWORD: "{{ mli_mysql_password }}"
+#               MLI4EVR_DB_NAME: "mli"
+#               MLI4EVR_DEBUGGING_ENABLED: "True"
+#               MLI4EVR_LOGGING_LOGFACES_HOST: "logfaces"
+#               MLI4EVR_LOGGING_LOGFACES_DOMAIN: "mli-tlo-sa"
+#           etc_hosts:
+#               logfaces: "{{ logfaces_ip }}"
+#               mysql: "{{ alpha_ip }}"
+#               rabbitmq: "{{ alpha_ip }}"
+#           hostname: "mli-event-processor"
+#           image: "registry.transparent.com/molde-mli-forever:{{ mli_image_tag }}"
+#           log_driver: "json-file"
+#           log_options:
+#               max-size: "50m"
+#           name: "mli-event-processor"
+#           network_mode: "bridge"
+#           published_ports:
+#           - "{{ mli_event_processor_http_port }}:8080"
+#           pull: False
+#           restart_policy: "always"
+#           state: "started"
+#           trust_image_content: True
 
       - name: MLI REST API
         docker_container:
