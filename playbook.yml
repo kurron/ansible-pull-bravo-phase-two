@@ -38,7 +38,7 @@
        report_event_processor_http_port: "3080"
        report_event_processor_jmx_port: "3020"
 
-       mli_image_tag: "14-master"
+       mli_image_tag: "16-master"
        mli_event_processor_http_port: "4080"
        mli_rest_api_http_port: "5080"
        mli_mysql_user: "mli"
