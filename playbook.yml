@@ -50,9 +50,9 @@
        lds_http_port: 7400
        lds_mysql_user: "lds"
        lds_mysql_password: "lds"
-       lds_profile: "dev"
+       lds_profile: "ild"
        lds_liquibase_sync: "yes"
-       lds_extra_config: "DATABASE_HOST=mysql~USE_GRAYLOG=False~LOCAL_IP_OVERRIDE={{ bravo_ip }}~DATABASE_USER={{ lds_mysql_user }}~DATABASE_PASSWORD={{ lds_mysql_password }}"
+       lds_extra_config: "DATABASE_HOST=mysql~USE_GRAYLOG=True~LOCAL_IP_OVERRIDE={{ bravo_ip }}~DATABASE_USER={{ lds_mysql_user }}~DATABASE_PASSWORD={{ lds_mysql_password }}~ALLOWED_HOSTS=['*']"
        lds_base: "/opt/lds"
        lds_web_fonts: "{{ lds_base }}/webfonts"
        lds_static_content: "{{ lds_base}}/static"
@@ -275,7 +275,7 @@
             volumes:
             - "{{ lds_web_fonts }}:/opt/media/webfonts:ro"
             - "{{ lds_static_content }}:/opt/lds_static:rw"
-            command: ["{{ lds_profile }}", "{{ lds_liquibase_sync }}", "{{ lds_extra_config }}"]
+            command: "{{ lds_profile }} {{ lds_liquibase_sync }} {{ lds_extra_config }}"
 
       - name: Varnish
         docker_container:
@@ -308,7 +308,7 @@
             env:
                 APP_PORT: "{{ lds_http_port }}"
                 VARNISH_PORT: "{{ lds_varnish_http_port }}"
-                APP_SERVER_IP: "lds"
+                APP_SERVER_IP: "{{ bravo_ip }}"
                 APP_SERVER_DNS_INTERNAL: "{{ lds_nginx_app_server_dns_internal }}"
                 APP_SERVER_DNS_EXTERNAL: "{{ lds_nginx_app_server_dns_external }}"
                 APP_ROOT: "/opt/app"
@@ -326,10 +326,10 @@
             name: "nginx"
             network_mode: "bridge"
             published_ports:
-            - "{{ lds_nginx_primary_insecure_port }}:80"
-            - "{{ lds_nginx_primary_secure_port }}:443"
-            - "{{ lds_nginx_secondary_insecure_port }}:81"
-            - "{{ lds_nginx_secondary_secure_port }}:444"
+            - "{{ lds_nginx_primary_insecure_port }}:{{ lds_nginx_primary_insecure_port }}"
+            - "{{ lds_nginx_primary_secure_port }}:{{ lds_nginx_primary_secure_port }}"
+            - "{{ lds_nginx_secondary_insecure_port }}:{{ lds_nginx_secondary_insecure_port }}"
+            - "{{ lds_nginx_secondary_secure_port }}:{{ lds_nginx_secondary_secure_port }}"
             pull: False
             restart_policy: "always"
             state: "started"
@@ -399,4 +399,3 @@
             - "/etc/timezone:/etc/timezone:ro"
 #           - "{{ tlo_base }}/tlo-client.jks:/opt/tlo/conf/jmx/tlo-client.jks:ro"
 #           - "{{ tlo_base }}/tlo-server.jks:/opt/tlo/conf/jmx/tlo-server.jks:ro"
-
