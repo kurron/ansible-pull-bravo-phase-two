@@ -68,7 +68,7 @@
        lds_nginx_secondary_insecure_port: 81
        lds_nginx_secondary_secure_port: 444
 
-       tlo_image_tag: "1.11.21"
+       tlo_image_tag: "2.0.0"
        tlo_base: "/opt/tlo"
        tlo_storage: "{{ tlo_base }}/storage"
        tlo_work: "{{ tlo_base }}/work"
@@ -352,27 +352,35 @@
                 SERVICE_TLO: true
                 SERVICE_MYSQL: false
                 SERVICE_TLO_CREATE_DATABASES: false
-                TLO_PROFILE: "rr5"
+                TLO_PROFILE: "bwedu"
+                TLO_CAP_ENABLE_MOLDE: true
+                TLO_CAP_ENABLE_REPORTING_GROUPS: true
+                TLO_CAP_ENABLE_SWAGGER: true
+                TLO_CAP_ENABLE_STICKE_SUPPORT: false
+                TLO_CFG_BOX_CONNECTOR_SSL: true
+                TLO_CFG_BOX_CONNECTOR_SSL_PORT: 8443
                 TLO_CFG_BOX_DATASOURCE_JDBC_URL: "jdbc:mysql://mysql:3306/box?autoReconnect=true"
                 TLO_CFG_BOX_DATASOURCE_JDBC_USERNAME: "bykiweb"
                 TLO_CFG_BOX_DATASOURCE_JDBC_PASSWORD: "bykiweb"
+                TLO_CFG_BOX_VERSION_USE_BUILDINFO: true
                 TLO_CFG_CONSOLE_DATASOURCE_JDBC_URL: "jdbc:mysql://mysql:3306/console?autoReconnect=true"
                 TLO_CFG_CONSOLE_DATASOURCE_JDBC_USERNAME: "bykiweb"
                 TLO_CFG_CONSOLE_DATASOURCE_JDBC_PASSWORD: "bykiweb"
-                TLO_CAP_ENABLE_REPORTING_GROUPS: true
-                TLO_CFG_BOX_VERSION_USE_BUILDINFO: true
-                TLO_CFG_BOX_CONNECTOR_SSL: true
-                TLO_CFG_BOX_CONNECTOR_SSL_PORT: 8443
                 TLO_CFG_LMSS_AWS_ENABLE: false
-                TLO_SERVICE_JMX_HOSTNAME: "https://10.10.10.20"
+                TLO_SERVICE_JMX_HOSTNAME: "10.10.10.20"
                 TLO_SERVICE_JMX_PORT: 4000
-                TLO_SERVICE_MEM_INIT: "192m"
+                TLO_SERVICE_MEM_INIT: "256m"
                 TLO_SERVICE_MEM_MAX: "1024m"
+                TLO_SERVICE_MEM_PERMGEN: "256m"
                 TLO_VERSION_CODENAME: "TLOILD"
                 TLO_SET_AMQP_BROKER_AUTHENTICATION: false
+                TLO_SET_AMQP_BROKER_EXCHANGE: "incoming-reporting-events"
+                TLO_SET_AMQP_BROKER_URI: "amqp://rabbitmq/bwedu"
                 TLO_SET_INTEGRATION_CANONICAL_HOSTNAME: "https://ild.transparent.com"
-                TLO_SET_INTEGRATION_EVENTLOG_TRANSMITTER_PERIOD: 86400
-                TLO_SET_INTEGRATION_AMQP_BROKER_URI: "amqp://rabbitmq/rr5"
+                TLO_SET_INTEGRATION_CW_URL: "http://{{ bravo_ip }}/builds/cw/bwedu/"
+                TLO_SET_INTEGRATION_LANGDATASERVICE_PROVIDER_URL: "http://{{ bravo_ip }}:8081"
+                TLO_SET_INTEGRATION_MOLDE_REPORT_TIMEOUT: 600
+                TLO_SET_INTEGRATION_MOLDE_URL: "https://{{ bravo_ip }}:8082/reports/rest-services/resources"
             etc_hosts:
                 mysql: "{{ bravo_ip }}"
                 rabbitmq: "{{ bravo_ip }}"
