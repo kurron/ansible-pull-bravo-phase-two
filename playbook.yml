@@ -378,7 +378,7 @@
                 TLO_SET_AMQP_BROKER_URI: "amqp://rabbitmq/bwedu"
                 TLO_SET_INTEGRATION_CANONICAL_HOSTNAME: "https://ild.transparent.com"
                 TLO_SET_INTEGRATION_CW_URL: "http://{{ bravo_ip }}/builds/cw/bwedu/"
-                TLO_SET_INTEGRATION_LANGDATASERVICE_PROVIDER_URL: "http://{{ bravo_ip }}:8081"
+                TLO_SET_INTEGRATION_LANGDATASERVICE_PROVIDER_URL: "http://{{ bravo_ip }}:8081/"
                 TLO_SET_INTEGRATION_MAIL_HOST: "{{ bravo_ip }}"
                 TLO_SET_INTEGRATION_MOLDE_REPORT_TIMEOUT: 600
                 TLO_SET_INTEGRATION_MOLDE_URL: "https://{{ bravo_ip }}:8082/reports/rest-services/resources"
